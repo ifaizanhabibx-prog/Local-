@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Table with Input</title>
+    <style>
+        table {
+            width: 60%;
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: center;
+        }
+
+        #form {
+            text-align: center;
+            margin: 20px;
+        }
+
+        input {
+            padding: 5px;
+            margin: 5px;
+        }
+
+        button {
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+
+        .delete-btn {
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            opacity: 0.8;
+        }
+
+        td.delete-btn {
+            background-color: crimson;
+            color: white;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 style="text-align: center;">Add Student</h1>
+
+    <!-- input fields -->
+    <div id="form">
+        <input type="text" id="name" placeholder="Enter your name">
+        <input type="number" id="age" placeholder="Enter your age">
+        <input type="text" id="grade" placeholder="Enter grade">
+        <button onclick="addRow()">Add Row</button>
+    </div>
+
+    <!--Table-->
+    <table id="studentTable">
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Grade</th>
+            <th>Action</th> <!-- Added a column for delete buttons -->
+        </tr>
+    </table>
+
+    <script>
+        function addRow() {
+            // Get values from input fields
+            const name = document.getElementById("name").value;
+            const age = document.getElementById("age").value;
+            const grade = document.getElementById("grade").value;
+
+            // Validate input fields
+            if (!name || !age || !grade) {
+                alert("Please enter all fields");
+                return;
+            }
+
+            let students = JSON.parse(localStorage.getItem("students")) || [];
+
+            // Add new student
+            students.push({ name, age, grade });
+
+            // Save to localStorage
+            localStorage.setItem("students", JSON.stringify(students));
+
+            // show updated table
+            displayTable();
+
+            // Clear input fields
+            document.getElementById("name").value = "";
+            document.getElementById("age").value = "";
+            document.getElementById("grade").value = "";
+        }
+
+        function displayTable() {
+            const table = document.getElementById("studentTable");
+
+            // Reset table header
+            table.innerHTML = `
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Grade</th>
+                    <th>Action</th>
+                </tr>
+            `;
+
+            // Get students from localStorage
+            let students = JSON.parse(localStorage.getItem("students")) || [];
+
+            // Create rows
+            students.forEach((student, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${student.name}</td>
+                    <td>${student.age}</td>
+                    <td>${student.grade}</td>
+                    <td><button class="delete-btn" onclick="deleteStudent(${index})">Delete</button></td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function deleteStudent(index) {
+            let students = JSON.parse(localStorage.getItem("students")) || [];
+            students.splice(index, 1);  // Remove student at the specified index
+            localStorage.setItem("students", JSON.stringify(students));
+            displayTable();  // Refresh table after deleting
+        }
+
+        window.onload = displayTable;
+    </script>
+</body>
+
+</html>
